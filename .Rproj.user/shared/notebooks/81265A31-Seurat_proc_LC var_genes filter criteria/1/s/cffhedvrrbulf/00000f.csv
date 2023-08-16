@@ -1,0 +1,4 @@
+"0","Loco.markers %>%"
+"0","    group_by(cluster) %>%"
+"0","    top_n(n = 10, wt = avg_log2FC) -> top10"
+"0","DoHeatmap(Loco, features = top10$gene) + NoLegend()"

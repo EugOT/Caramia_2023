@@ -1,0 +1,5 @@
+"0","# For performing differential expression after integration, we switch back to the original"
+"0","# data"
+"0","DefaultAssay(lc.combined) <- ""SCT"""
+"0","FeaturePlot(lc.combined, slot = ""scale.data"", features = c(""Hcrtr1"", ""Sstr2"", ""Calcr"", ""Galr1""), order = T)"
+"2","Warning: The following requested variables were not found: Sstr2"

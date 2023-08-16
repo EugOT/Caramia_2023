@@ -1,0 +1,6 @@
+"0","genestomas2 <- FeaturePlot(lc.combined, features = c(""Gal"", ""Calca"", ""Hcrt"", ""Cck"", ""Crh"", ""Ghrhr"", ""Kiss1"", ""Pomc"", ""Pmch"", ""Npy"", ""Nts"", ""Penk"", ""Pdyn"", ""Pnoc"", ""Oxt"", ""Sst"", ""Grp"", ""Cartpt"", ""Tac1"",""Tac2"", ""Tac3"", ""Trh"", ""Vip"", ""Avp"", ""Rln1"", ""Qrfp"", ""Npvf"", ""Adcyap1"", ""Bdnf"", ""Nms"", ""Nmb"", ""Nmu"", ""Ucn""), order = T,pt.size = 1, ncol = 6, max.cutoff = ""q80"")"
+"2","Warning: The following requested variables were not found (10 out of 11 shown): Hcrt, Ghrhr, Kiss1, Pmch, Tac2, Tac3, Trh, Rln1, Npvf, Nms"
+"0","cowplot::save_plot(filename = 'FeaturePlot_genes_tomas_NP.pdf',"
+"0","                   plot = genestomas2,"
+"0","                   base_height = 10,"
+"0","                   base_asp = 1.6)"

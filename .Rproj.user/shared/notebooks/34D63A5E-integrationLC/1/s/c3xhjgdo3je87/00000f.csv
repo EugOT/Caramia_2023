@@ -1,0 +1,2 @@
+"0","FeaturePlot(lc.combinedTHa, slot = ""scale.data"", features = c(""Gal"", ""Grp"", ""Sst"", ""Slc17a6"", ""Pdyn"", ""Cartpt"", ""Bdnf"", ""Th"", ""Slc18a2"", ""Dbh"", ""Gad1"", ""Slc6a2"", ""Calca"", ""Calcr"", ""Phox2a"", ""Phox2b"", ""Eya1"", ""Eya2"", ""Galr1""), order = T)"
+"2","Warning: The following requested variables were not found: Sst, Gad1, Galr1"

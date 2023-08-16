@@ -1,0 +1,4 @@
+"0","# For performing differential expression after integration, we switch back to the original"
+"0","# data"
+"0","DefaultAssay(lc.combined) <- ""RNA"""
+"0","FeaturePlot(lc.combined, features = c(""Slc17a6"", ""Slc17a7"", ""Gad2"", ""Gad1"", ""Npy"", ""Galr1"", ""Scrt2""), order = T, max.cutoff = ""q80"")"

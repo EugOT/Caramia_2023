@@ -1,0 +1,4 @@
+"0","nephr.markers.std %>%"
+"0","    group_by(cluster) %>%"
+"0","    top_n(n = 3, wt = avg_log2FC) -> top3"
+"0","DotPlot(lc.combined1,features = c(""Gad1"", ""Slc32a1"", ""Slc17a6"", ""Slc17a7"", unique(top3$gene)))+ RotatedAxis()"

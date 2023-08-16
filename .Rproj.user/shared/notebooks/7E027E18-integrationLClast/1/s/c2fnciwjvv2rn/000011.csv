@@ -1,0 +1,5 @@
+"0","DPmarkers <- DotPlot(lc.combined1,features = c(""Gad1"", ""Slc32a1"", ""Slc17a6"", unique(top3$gene)))+ RotatedAxis()"
+"0","cowplot::save_plot(filename = 'Dotplot_markers_neurons.pdf',"
+"0","                   plot = DPmarkers,"
+"0","                   base_height = 7,"
+"0","                   base_asp = 2.2)"

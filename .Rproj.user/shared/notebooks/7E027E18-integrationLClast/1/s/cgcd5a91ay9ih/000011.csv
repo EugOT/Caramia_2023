@@ -1,0 +1,12 @@
+"0",""
+"0",""
+"0","plots <- VlnPlot(lc.combined1, features = rownames(nephr.markers)[1:10], split.by = ""id"","
+"0","                 group.by = ""seurat_clusters"", pt.size = 0, combine = FALSE)"
+"2","The default behaviour of split.by has changed.
+Separate violin plots are now plotted side-by-side.
+To restore the old behaviour of a single split violin,
+set split.plot = TRUE.
+      
+This message will be shown once per session.
+"
+"0","wrap_plots(plots = plots, ncol = 1)"

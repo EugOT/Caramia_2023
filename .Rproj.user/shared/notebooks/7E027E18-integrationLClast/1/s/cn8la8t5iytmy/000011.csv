@@ -1,0 +1,5 @@
+"0","FP_peptides <- FeaturePlot(lc.combined, features = c(""Th"", ""Dbh"", ""Gal"", ""Grp"", ""Pdyn"", ""Cartpt"", ""Bdnf"", ""Npy"", ""Cck"", ""Sst"", ""Crh"", ""Vip""), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 1.5, max.cutoff = ""q75"")"
+"0","cowplot::save_plot(filename = 'FeaturePlot_NP_neurons.pdf',"
+"0","                   plot = FP_peptides,"
+"0","                   base_height = 7,"
+"0","                   base_asp = 1.6)"

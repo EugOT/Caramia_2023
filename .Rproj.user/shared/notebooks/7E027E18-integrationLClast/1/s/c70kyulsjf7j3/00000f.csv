@@ -1,0 +1,96 @@
+"0","lc1 <- LoadH5Seurat(""data/Locus_Coruleus1.h5Seurat"") "
+"2","Validating h5Seurat file
+"
+"2","Initializing RNA with data
+"
+"2","Adding counts for RNA
+"
+"2","Adding miscellaneous information for RNA
+"
+"2","Initializing SCT with data
+"
+"2","Adding counts for SCT
+"
+"2","Adding scale.data for SCT
+"
+"2","Adding variable feature information for SCT
+"
+"2","Adding miscellaneous information for SCT
+"
+"2","Adding reduction pca
+"
+"2","Adding cell embeddings for pca
+"
+"2","Adding feature loadings for pca
+"
+"2","Adding miscellaneous information for pca
+"
+"2","Adding reduction tsne
+"
+"2","Adding cell embeddings for tsne
+"
+"2","Adding miscellaneous information for tsne
+"
+"2","Adding reduction umap
+"
+"2","Adding cell embeddings for umap
+"
+"2","Adding miscellaneous information for umap
+"
+"2","Adding graph SCT_nn
+"
+"2","Adding graph SCT_snn
+"
+"2","Adding command information
+"
+"2","Adding cell-level metadata
+"
+"2","Adding miscellaneous information
+"
+"2","Adding tool-specific results
+"
+"0","lc2 <- LoadH5Seurat(""data/Locus_Coruleus.h5Seurat"")"
+"2","Validating h5Seurat file
+"
+"2","Initializing RNA with data
+"
+"2","Adding counts for RNA
+"
+"2","Adding miscellaneous information for RNA
+"
+"2","Initializing SCT with data
+"
+"2","Adding counts for SCT
+"
+"2","Adding scale.data for SCT
+"
+"2","Adding variable feature information for SCT
+"
+"2","Adding miscellaneous information for SCT
+"
+"2","Adding reduction pca
+"
+"2","Adding cell embeddings for pca
+"
+"2","Adding feature loadings for pca
+"
+"2","Adding miscellaneous information for pca
+"
+"2","Adding reduction umap
+"
+"2","Adding cell embeddings for umap
+"
+"2","Adding miscellaneous information for umap
+"
+"2","Adding graph SCT_nn
+"
+"2","Adding graph SCT_snn
+"
+"2","Adding command information
+"
+"2","Adding cell-level metadata
+"
+"2","Adding miscellaneous information
+"
+"2","Adding tool-specific results
+"

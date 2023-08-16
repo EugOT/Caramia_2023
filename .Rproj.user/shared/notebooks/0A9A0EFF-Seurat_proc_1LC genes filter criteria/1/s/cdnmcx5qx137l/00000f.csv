@@ -1,0 +1,8 @@
+"0","Loco <- subset(Loco, subset = nFeature_RNA > 500 & percent.mt < 10)"
+"0","# normalize and run dimensionality reduction on control dataset"
+"0","Loco <- SCTransform(Loco, return.only.var.genes = FALSE, verbose = FALSE, variable.features.n = 10000) %>%"
+"0","    RunPCA(npcs = 100, verbose = FALSE) %>%"
+"0","    RunUMAP(dims = 1:20, verbose = FALSE) %>%"
+"0","    FindNeighbors(reduction = ""pca"", dims = 1:100, n.trees = 200, annoy.metric = ""cosine"", verbose = FALSE) %>%"
+"0","    FindClusters(resolution = 5, algorithm = 1, verbose = FALSE)"
+"0","DimHeatmap(Loco, dims = 1:20, balanced = TRUE)"

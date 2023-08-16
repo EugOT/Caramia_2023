@@ -1,0 +1,595 @@
+```{r packages}
+library(Seurat)
+library(SeuratDisk)
+library(patchwork)
+library(magrittr)
+library(dplyr)
+```
+
+```{r}
+lc1 <- LoadH5Seurat("data/Locus_Coruleus1.h5Seurat") 
+lc2 <- LoadH5Seurat("data/Locus_Coruleus.h5Seurat")
+```
+
+```{r}
+lc1$id <- "lc1"
+lc2$id <- "lc2"
+lc.list <- list(lc1, lc2)
+```
+
+```{r}
+features <- SelectIntegrationFeatures(object.list = lc.list, nfeatures = 10000)
+lc.list <- PrepSCTIntegration(object.list = lc.list, anchor.features = features)
+```
+
+```{r}
+lc.anchors <- FindIntegrationAnchors(object.list = lc.list, anchor.features = features, normalization.method = "SCT")
+```
+
+```{r}
+lc.combined <- IntegrateData(anchorset = lc.anchors, normalization.method = "SCT")
+```
+
+```{r}
+VlnPlot(lc.combined, features = "nFeature_RNA")
+```
+
+```{r}
+# original unmodified data still resides in the 'RNA' assay
+DefaultAssay(lc.combined) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+lc.combined <- RunPCA(lc.combined, npcs = 30, verbose = FALSE)
+lc.combined <- RunUMAP(lc.combined, reduction = "pca", dims = 1:30)
+lc.combined <- FindNeighbors(lc.combined, reduction = "pca", dims = 1:30)
+lc.combined <- FindClusters(lc.combined,  resolution = 4)
+```
+
+```{r}
+DefaultAssay(lc.combined) <- "integrated"
+lc.combined %<>% subset(idents = c(0, 17), invert = TRUE)
+RunPCA(lc.combined, npcs = 30, verbose = FALSE) %>%
+    RunUMAP( dims = 1:30, verbose = FALSE)
+```
+```{r}
+table(lc.combined$id)
+```
+
+
+```{r}
+# Visualization
+p1 <- DimPlot(lc.combined, reduction = "umap", group.by = "id")
+p2 <- DimPlot(lc.combined, reduction = "umap", label = TRUE, repel = TRUE)
+p1 + p2
+```
+
+```{r}
+DimPlot(lc.combined, reduction = "umap", split.by = "id")
+```
+
+```{r}
+DimPlot(lc.combined, reduction = "umap", pt.size = 2, label = TRUE)
+Neuron_clusters <- DimPlot(lc.combined, reduction = "umap", pt.size = 2.3, label = TRUE)
+cowplot::save_plot(filename = 'DimPlot_neurons.pdf',
+                   plot = Neuron_clusters,
+                   base_height = 7,
+                   base_asp = 1.1)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Vip", "Npy", "Cck", "Crh"), order = T, pt.size = 1, max.cutoff = "q75")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Th", "Dbh", "Gal", "Grp", "Pdyn", "Cartpt", "Bdnf", "Npy", "Cck", "Sst", "Crh", "Vip"), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 1.5, max.cutoff = "q75")
+FP_peptides <- FeaturePlot(lc.combined, features = c("Th", "Dbh", "Gal", "Grp", "Pdyn", "Cartpt", "Bdnf", "Npy", "Cck", "Sst", "Crh", "Vip"), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 1.5, max.cutoff = "q75")
+cowplot::save_plot(filename = 'FeaturePlot_NP_neurons.pdf',
+                   plot = FP_peptides,
+                   base_height = 7,
+                   base_asp = 1.6)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Eya1", "Eya2", "Gal", "Grp", "Pdyn", "Cartpt","Npy", "Npy1r", "Hcrtr1", "Phox2a", "Phox2b", "Cck", "Sst", "Crh", "Vip", "Npy2r","Npy5r", "Galr1"), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 1.5, ncol = 9, max.cutoff = "q80")
+FP_peptides <- FeaturePlot(lc.combined, features = c("Eya1", "Eya2", "Gal", "Grp", "Pdyn", "Cartpt","Npy", "Npy1r", "Hcrtr1", "Phox2a", "Phox2b", "Cck", "Sst", "Crh", "Vip", "Npy2r","Npy5r", "Galr1"), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 2, ncol = 9, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_NP_neurons2.pdf',
+                   plot = FP_peptides,
+                   base_height = 7,
+                   base_asp = 4.5)
+```
+
+```{r}
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Xist", "Tsix", "Eif2s3y", "Ddx3y", "Uty", "Kdm5d"), order = T, pt.size = 2, max.cutoff = "q75")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Tubb3", "Slc6a2", "Slc18a2", "Snap25", "Dbh", "Slc32a1", "Stmn2", "Gad1", "Gad2", "Ndrg4", "Slc17a6", "Slc17a7"), order = T, pt.size = 1.5, raster = FALSE, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), ncol = 3, max.cutoff = "q80")
+FP_NT <- FeaturePlot(lc.combined, features = c("Tubb3", "Slc6a2", "Slc18a2", "Snap25", "Dbh", "Slc32a1", "Stmn2", "Gad1", "Gad2", "Ndrg4", "Slc17a6", "Slc17a7"), order = T, pt.size = 1.5, raster = FALSE, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), ncol = 3, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_NT_neurons.pdf',
+                   plot = FP_NT,
+                   base_height = 7,
+                   base_asp = 1.2)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1"), order = T, max.cutoff = "q80")
+MarkersNPR <- FeaturePlot(lc.combined, features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1"), order = T,pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_MarkersNPR.pdf',
+                   plot = MarkersNPR,
+                   base_height = 7,
+                   base_asp = 1.2)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), order = T, pt.size = 2, max.cutoff = "q75")
+TF <- FeaturePlot(lc.combined, features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), order = T,pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_TF.pdf',
+                   plot = TF,
+                   base_height = 7,
+                   base_asp = 1.2)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Calcrl", "Ddc", "Ramp1", "Ramp2", "Ramp3", "Hcrtr2", "Cckbr", "Crhr1", "Crhr2", "Ghrhr", "Gipr", "Gip", "Kiss1r", "Lepr", "Mc4r", "Mchr1", "Mchr2", "Npy1r", "Npy2r", "Npy4r", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Sstr5", "Tacr1","Tacr2", "Tacr3", "Trhr", "Vipr1", "Vipr2"), order = T, pt.size = 2, ncol = 6, max.cutoff = "q80")
+genestomas <- FeaturePlot(lc.combined, features = c("Calcrl", "Ddc", "Ramp1", "Ramp2", "Ramp3", "Hcrtr2", "Cckbr", "Crhr1", "Crhr2", "Ghrhr", "Gipr", "Gip", "Kiss1r", "Lepr", "Mc4r", "Mchr1", "Mchr2", "Npy1r", "Npy2r", "Npy4r", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Sstr5", "Tacr1","Tacr2", "Tacr3", "Trhr", "Vipr1", "Vipr2"), order = T,pt.size = 1, ncol = 6, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genes_tomas.pdf',
+                   plot = genestomas,
+                   base_height = 10,
+                   base_asp = 1.6)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Gal", "Calca", "Hcrt", "Cck", "Crh", "Ghrhr", "Kiss1", "Pomc", "Pmch", "Npy", "Nts", "Penk", "Pdyn", "Pnoc", "Oxt", "Sst", "Grp", "Cartpt", "Tac1","Tac2", "Tac3", "Trh", "Vip", "Avp", "Rln1", "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Nms", "Nmb", "Nmu", "Ucn"), order = T, pt.size = 2, ncol = 6, max.cutoff = "q80")
+genestomas2 <- FeaturePlot(lc.combined, features = c("Gal", "Calca", "Hcrt", "Cck", "Crh", "Ghrhr", "Kiss1", "Pomc", "Pmch", "Npy", "Nts", "Penk", "Pdyn", "Pnoc", "Oxt", "Sst", "Grp", "Cartpt", "Tac1","Tac2", "Tac3", "Trh", "Vip", "Avp", "Rln1", "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Nms", "Nmb", "Nmu", "Ucn"), order = T,pt.size = 1, ncol = 6, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genes_tomas_NP.pdf',
+                   plot = genestomas2,
+                   base_height = 10,
+                   base_asp = 1.6)
+```
+
+```{r gj-1, fig.width=12, fig.asp=0.618}
+DefaultAssay(lc.combined) <- "RNA"
+gj1 <- FeaturePlot(
+  lc.combined,
+  features = c(
+    "Gja1",
+    "Gja2",
+    "Gja3",
+    "Gja4",
+    "Gja5",
+    "Gja8",
+    "Gja9",
+    "Gja10",
+    "Gjb1",
+    "Gjb2",
+    "Gjb3",
+    "Gjb4",
+    "Gjb5",
+    "Gjb6",
+    "Gjb7",
+    "Gjc1",
+    "Gjc2",
+    "Gjc3",
+    "Gjd2",
+    "Gjd3",
+    "Gjd4",
+    "Gje1"
+  ),
+  order = T,
+  pt.size = 1,
+  ncol = 3,
+  max.cutoff = "q80"
+)
+
+cowplot::save_plot(filename = 'FeaturePlot-GJP_1.pdf',
+                   plot = gj1,
+                   base_height = 12,
+                   base_asp = 1.618)
+gj1
+```
+
+```{r cckr-1, fig.height=7, fig.asp=0.206}
+DefaultAssay(lc.combined) <- "RNA"
+cckr1 <- FeaturePlot(
+  lc.combined,
+  features = c(
+    "Gpr173",
+    "Cckar",
+    "Cckbr"
+  ),
+  order = T,
+  pt.size = 1.5,
+  ncol = 3,
+  max.cutoff = "q80"
+)
+cowplot::save_plot(filename = 'FeaturePlot-cckr.pdf',
+                   plot = cckr1,
+                   base_height = 7,
+                   base_asp = 5)
+cckr1
+```
+
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "SCT"
+FeaturePlot(lc.combined, slot = "scale.data", features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1"), order = T)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "integrated"
+FeaturePlot(lc.combined, slot = "scale.data", features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1", "Scrt2"), order = T)
+```
+
+```{r markers-of-necells-conserved-across-ds, fig.width=8, fig.height=20}
+lc.combined1 <- PrepSCTFindMarkers(lc.combined)
+nephr.markers.std <- FindAllMarkers(lc.combined1, assay = "SCT", verbose = FALSE)
+nephr.markers.ROC <- FindAllMarkers(lc.combined1, assay = "SCT", test.use = "roc", verbose = FALSE)
+nephr.markers <- FindConservedMarkers(lc.combined1, assay = "SCT", 
+                                      ident.1 = "1", grouping.var = "id",
+                                      verbose = FALSE)
+head(nephr.markers, 10)
+
+
+plots <- VlnPlot(lc.combined1, features = rownames(nephr.markers)[1:10], split.by = "id",
+                 group.by = "seurat_clusters", pt.size = 0, combine = FALSE)
+wrap_plots(plots = plots, ncol = 1)
+
+FeaturePlot(lc.combined1, 
+            features = rownames(nephr.markers)[1:10],
+            split.by = "id", max.cutoff = 3,
+            order = FALSE, # here it's more convincing 
+            cols = c("#C0C9D1", "#801C29"))
+```
+
+```{r}
+nephr.markers.std %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+    
+DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+heatmapneur <- DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+cowplot::save_plot(filename = 'Heatmap_markers_neurons.pdf',
+                   plot = heatmapneur,
+                   base_height = 10,
+                   base_asp = 1.6)
+```
+
+```{r}
+nephr.markers.std %>%
+    group_by(cluster) %>%
+    top_n(n = 3, wt = avg_log2FC) -> top3
+DotPlot(lc.combined1,features = c("Gad1", "Slc32a1", "Slc17a6", "Slc17a7", unique(top3$gene)))+ RotatedAxis()
+DPmarkers <- DotPlot(lc.combined1,features = c("Gad1", "Slc32a1", "Slc17a6", unique(top3$gene)))+ RotatedAxis()
+cowplot::save_plot(filename = 'Dotplot_markers_neurons.pdf',
+                   plot = DPmarkers,
+                   base_height = 7,
+                   base_asp = 2.2)
+```
+
+```{r}
+nephr.markers.ROC %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = power) -> top10
+DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+```
+
+```{r}
+nephr.markers.ROC %>%
+    group_by(cluster) %>%
+    top_n(n = 5, wt = power) -> top5r
+DPmarkers <- DotPlot(lc.combined1,features = unique(top5r$gene))+ RotatedAxis()
+cowplot::save_plot(filename = 'Dotplot_markers_neurons.pdf',
+                   plot = DPmarkers,
+                   base_height = 7,
+                   base_asp = 3.5)
+```
+
+```{r}
+DefaultAssay(lc.combined) <- "integrated"
+lc.combinedTH <- subset(lc.combined, idents = 1)
+lc.combinedTH <- FindNeighbors(lc.combinedTH, reduction = "pca", dims = 1:30, n.trees = 200, annoy.metric = "cosine", verbose = FALSE) %>%
+  FindClusters(resolution = 1, algorithm = 1, verbose = FALSE) %>%
+  RunUMAP( dims = 1:30, verbose = FALSE) 
+DimHeatmap(lc.combinedTH, dims = 1:20, cells = 82, balanced = TRUE)
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), order = T)
+```
+
+```{r gj-2, fig.width=12, fig.asp=0.618}
+DefaultAssay(lc.combinedTH) <- "RNA"
+gj2 <- FeaturePlot(
+  lc.combinedTH,
+  features = c(
+    "Gja1",
+    "Gja2",
+    "Gja3",
+    "Gja4",
+    "Gja5",
+    "Gja8",
+    "Gja9",
+    "Gja10",
+    "Gjb1",
+    "Gjb2",
+    "Gjb3",
+    "Gjb4",
+    "Gjb5",
+    "Gjb6",
+    "Gjb7",
+    "Gjc1",
+    "Gjc2",
+    "Gjc3",
+    "Gjd2",
+    "Gjd3",
+    "Gjd4",
+    "Gje1"
+  ),
+  order = T,
+  pt.size = 1,
+  ncol = 3,
+  max.cutoff = "q80"
+)
+
+cowplot::save_plot(filename = 'FeaturePlot-GJP_TH.pdf',
+                   plot = gj2,
+                   base_height = 12,
+                   base_asp = 1.618)
+gj2
+```
+
+```{r cckr-2, fig.height=7, fig.asp=0.206}
+DefaultAssay(lc.combinedTH) <- "RNA"
+cckr2 <- FeaturePlot(
+  lc.combinedTH,
+  features = c(
+    "Gpr173",
+    "Cckar",
+    "Cckbr"
+  ),
+  order = T,
+  pt.size = 3,
+  ncol = 3,
+  max.cutoff = "q80"
+)
+cowplot::save_plot(filename = 'FeaturePlot-cckr_TH.pdf',
+                   plot = cckr2,
+                   base_height = 7,
+                   base_asp = 5)
+cckr2
+```
+
+
+```{r}
+DimPlot(lc.combinedTH, reduction = "umap", pt.size = 3)
+GroupsNELC <- DimPlot(lc.combinedTH, reduction = "umap", pt.size = 3)
+cowplot::save_plot(filename = 'DimPlot_groupsLC.pdf',
+                   plot = GroupsNELC,
+                   base_height = 7,
+                   base_asp = 2)
+```
+
+```{r}
+lc.combinedTH
+```
+
+
+```{r}
+janitor::tabyl(lc.combinedTH@meta.data, id, seurat_clusters)
+```
+
+
+
+
+```{r}
+DimPlot(lc.combinedTH, reduction = "umap", pt.size = 3, split.by = "id")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "SCT"
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Scgn", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1", "Hcrtr1"), order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNE <- FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1", "Hcrtr1"), order = T, pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNEsct.pdf',
+                   plot = GenesLCNE,
+                   base_height = 10,
+                   base_asp = 1.4)
+```
+
+```{r}
+# For performing diff
+erential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "SCT"
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Slc18a2", "Slc6a2", "Gabra2", "Gabbr2", "Gal", "Grp", "Galr1", "Xist", "Pdyn", "Cartpt", "Hcrtr1", "Ddx3y", "Bdnf",  "Calca", "Calcr", "Uty", "Phox2a", "Phox2b", "Eya1", "Eya2"), order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNE <- FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Slc18a2", "Slc6a2", "Gabra2", "Gabbr2", "Gal", "Grp", "Galr1", "Xist", "Pdyn", "Cartpt", "Hcrtr1", "Ddx3y", "Bdnf",  "Calca", "Calcr", "Uty", "Phox2a", "Phox2b", "Eya1", "Eya2"), order = T, pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNEsct1.pdf',
+                   plot = GenesLCNE,
+                   base_height = 10,
+                   base_asp = 1.4)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Scgn"), order = T, pt.size = 2, max.cutoff = "q80")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Slc18a2", "Slc6a2", "Gabra2", "Gabbr1", "Gal", "Grp", "Galr1", "Xist", "Pdyn", "Cartpt", "Hcrtr1", "Ddx3y", "Bdnf",  "Calca", "Calcr", "Uty", "Phox2a", "Phox2b", "Eya1", "Eya2"), order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNE1 <- FeaturePlot(lc.combinedTH, features = c("Slc18a2", "Slc6a2", "Gabra2", "Gabbr1", "Gal", "Grp", "Galr1", "Xist", "Pdyn", "Cartpt", "Hcrtr1", "Ddx3y", "Bdnf",  "Calca", "Calcr", "Uty", "Phox2a", "Phox2b", "Eya1", "Eya2"), order = T, pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNE1.pdf',
+                   plot = GenesLCNE1,
+                   base_height = 10,
+                   base_asp = 1.4)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Gal", "Calca", "Crh", "Prok1", "Pomc",  "Npy", "Nts", "Penk", "Pdyn", "Grp", "Cartpt", "Vip",  "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Oxt", "Avp", "Sst","Tac1", "Nmb", "Ucn", "Cck", "Pnoc", "Tac2", "Tac3", "Trh","Hcrt", "Ghrh","Pmch", "Avp", "Rln1", "Nms", "Nmu"), ncol = 5, order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNENP <- FeaturePlot(lc.combinedTH, features = c("Gal", "Calca", "Crh", "Kiss1", "Pomc",  "Npy", "Nts", "Penk", "Pdyn", "Grp", "Cartpt", "Vip",  "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Oxt", "Avp", "Sst","Tac1", "Nmb", "Ucn", "Cck", "Pnoc",  "Tac2", "Tac3", "Trh","Hcrt", "Ghrh","Pmch", "Rln1", "Nms", "Nmu"), order = T, pt.size = 2, ncol = 5, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_Tomas genesLCNENP.pdf',
+                   plot = GenesLCNENP,
+                   base_height = 10,
+                   base_asp = 1.8)
+```
+
+```{r}
+DefaultAssay(lc.combinedTH) <- "SCT"
+FeaturePlot(lc.combinedTH, features = c("Gal", "Calca", "Hcrt", "Cck", "Crh", "Ghrhr", "Kiss1", "Pomc", "Pmch", "Npy", "Nts", "Penk", "Pdyn", "Pnoc", "Oxt", "Sst", "Grp", "Cartpt", "Tac1","Tac2", "Tac3", "Trh", "Vip", "Avp", "Rln1", "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Nms", "Nmb", "Nmu", "Ucn"), order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNENPSct <- FeaturePlot(lc.combinedTH, features = c("Gal", "Calca", "Hcrt", "Cck", "Crh", "Ghrhr", "Kiss1", "Pomc", "Pmch", "Npy", "Nts", "Penk", "Pdyn", "Pnoc", "Oxt", "Sst", "Grp", "Cartpt", "Tac1","Tac2", "Tac3", "Trh", "Vip", "Avp", "Rln1", "Qrfp", "Npvf", "Adcyap1", "Bdnf", "Nms", "Nmb", "Nmu", "Ucn"), order = T, pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_Tomas genesLCNENPSct.pdf',
+                   plot = GenesLCNENPSct,
+                   base_height = 10,
+                   base_asp = 1.4)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1"), order = T, pt.size = 2, max.cutoff = "q80")
+GenesLCNE <- FeaturePlot(lc.combinedTH,  features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1", "Chodl"), order = T, pt.size = 2, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNE.pdf',
+                   plot = GenesLCNE,
+                   base_height = 10,
+                   base_asp = 1.4)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Calcrl", "Galr1", "Ramp1", "Ramp2", "Ramp3", "Hcrtr2", "Cckbr", "Crhr1", "Crhr2", "Ghrhr", "Gipr", "Gip", "Kiss1r", "Lepr", "Mc4r", "Mchr1", "Mchr2", "Npy1r", "Npy2r", "Npy4r", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Sstr5", "Tacr1","Tacr2", "Tacr3", "Trhr", "Vipr1", "Vipr2"), order = T, pt.size = 2, ncol = 6, max.cutoff = "q80")
+GenesLCNE2 <- FeaturePlot(lc.combinedTH,  features = c("Calcrl", "Galr1", "Ramp1", "Ramp2", "Ramp3", "Hcrtr2", "Cckbr", "Crhr1", "Crhr2", "Ghrhr", "Gipr", "Gip", "Kiss1r", "Lepr", "Mc4r", "Mchr1", "Mchr2", "Npy1r", "Npy2r", "Npy4r", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Sstr5", "Tacr1","Tacr2", "Tacr3", "Trhr", "Vipr1", "Vipr2"), order = T, pt.size = 2, ncol = 6, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNE2.pdf',
+                   plot = GenesLCNE2,
+                   base_height = 10,
+                   base_asp = 1.6)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Gal", "Galr1","Calcr", "Calcrl", "Ramp1", "Ramp2", "Ramp3", "Hcrtr1", "Hcrtr2", "Cckar", "Cckbr", "Crhr1", "Crhr2", "Th", "Gipr", "Kiss1r", "Lepr", "Mc3r", "Mc4r", "Mchr1", "Dbh", "Npy1r", "Npy2r", "Grp", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Cartpt", "Tacr1","Gad2", "Tacr3", "Trhr", "Vipr1", "Vipr2", "Avpr1a", "Avpr2", "Prokr1", "Prokr2", "Adcyap1r1", "Grpr", "Cntfr", "Nmur2"), order = T, pt.size = 2, ncol = 6, max.cutoff = "q80")
+GenesLCNE3 <- FeaturePlot(lc.combinedTH,  features = c("Gal", "Galr1","Calcr", "Calcrl", "Ramp1", "Ramp2", "Ramp3", "Hcrtr1", "Hcrtr2", "Cckar", "Cckbr", "Crhr1", "Crhr2", "Th", "Gipr", "Kiss1r", "Lepr", "Mc3r", "Mc4r", "Mchr1", "Dbh", "Npy1r", "Npy2r", "Grp", "Npy5r", "Ntsr1", "Ntsr2", "Oprd1", "Oprk1", "Oprl1", "Oprm1", "Oxtr", "Sctr", "Sstr1", "Sstr2", "Sstr3", "Cartpt", "Tacr1","Gad2", "Tacr3", "Trhr", "Vipr1", "Vipr2", "Avpr1a", "Avpr2", "Prokr1", "Prokr2",  "Adcyap1r1", "Grpr","Cntfr", "Nmur2"), order = T, pt.size = 2, ncol = 7, max.cutoff = "q80")
+cowplot::save_plot(filename = 'FeaturePlot_genesLCNE3.pdf',
+                   plot = GenesLCNE3,
+                   base_height = 10,
+                   base_asp = 1.8)
+```
+
+```{r}
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Xist", "Tsix", "Eif2s3y", "Ddx3y", "Uty", "Kdm5d"), order = T, pt.size = 2, max.cutoff = "q80")
+```
+
+```{r}
+DefaultAssay(lc.combinedTH) <- "integrated"
+FeaturePlot(lc.combinedTH, features = c("Xist", "Tsix", "Eif2s3y", "Ddx3y", "Uty", "Kdm5d"), order = T, pt.size = 2, max.cutoff = "q80")
+```
+
+```{r Markers}
+lc.combinedTH <- PrepSCTFindMarkers(lc.combinedTH)
+Lcth.markers <- FindAllMarkers(lc.combinedTH, only.pos = TRUE, test.use = "MAST", min.pct = 0.1, logfc.threshold = 0.25)
+Lcth.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 20, order_by = avg_log2FC)
+```
+
+```{r}
+Lcth.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 20, wt = avg_log2FC) -> top20
+DoHeatmap(lc.combinedTH, features = top20$gene) + NoLegend()
+
+FeaturePlot(lc.combinedTH, 
+            features = rownames(nephr.markers)[1:10],
+            split.by = "id", max.cutoff = 3,
+            order = FALSE, # here it's more convincing 
+            cols = c("#C0C9D1", "#801C29"))
+Lcth.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 7, wt = avg_log2FC) -> top7
+NEgenesHM <- DoHeatmap(lc.combinedTH, features = top7$gene) + NoLegend()
+cowplot::save_plot(filename = 'Heatmap_genesLCNE.pdf',
+                   plot = NEgenesHM,
+                   base_height = 5,
+                   base_asp = 2.5)
+```
+
+```{r}
+DotPlot(lc.combinedTH,features = top20$gene, group.by = 'integrated_snn_res.1', assay = "SCT")+RotatedAxis()
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "SCT"
+FeaturePlot(lc.combinedTH, features = c("Gabra1", "Gabra2", "Gabra3", "Gabra4", "Gabra5", "Gabra6", "Gabbr1", "Gabbr2"), order = T)
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "integrated"
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Gabra1", "Gabra2", "Gabra3", "Gabra4", "Gabra5", "Gabra6", "Gabbr1", "Gabbr2"), order = T, , max.cutoff = "q80")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "RNA"
+FeaturePlot(lc.combinedTH, features = c("Gabra1", "Gabra2", "Gabra3", "Gabra4", "Gabra5", "Gabra6", "Gabbr1", "Gabbr2"), ncol = 4, order = T, pt.size =3, max.cutoff = "q75")
+Gabr <- FeaturePlot(lc.combinedTH, features = c("Gabra1", "Gabra2", "Gabra3", "Gabra4", "Gabra5", "Gabra6", "Gabbr1", "Gabbr2"),ncol = 4, order = T, pt.size =3, max.cutoff = "q75")
+cowplot::save_plot(filename = 'FeaturePlot_GabaLCNE.pdf',
+                   plot = Gabr,
+                   base_height = 5,
+                   base_asp = 3.5)
+```
+
+```{r}
+FeaturePlot(lc.combinedTH, features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), pt.size = 3, max.cutoff = "q75")
+```
+
+```{r}
+FeaturePlot(lc.combinedTH, features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), pt.size = 3, max.cutoff = 10, order = T) + scale_color_gradient(trans = "log1p")
+```
+
+```{r}
+FeaturePlot(lc.combinedTH, features = c("Gal", "Grp", "Sst", "Pdyn", "Cartpt", "Bdnf", "Calca", "Npy", "Sst"), order = T, pt.size = 3,  max.cutoff = "q90")
+```

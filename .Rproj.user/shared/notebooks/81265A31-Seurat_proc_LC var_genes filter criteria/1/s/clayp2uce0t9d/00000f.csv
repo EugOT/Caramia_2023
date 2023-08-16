@@ -1,0 +1,4 @@
+"0","Loco <- subset(Loco, subset = nFeature_RNA > 500 & percent.mt < 15)"
+"0","plot3 <- FeatureScatter(Loco, feature1 = ""nCount_RNA"", feature2 = ""percent.mt"")"
+"0","plot2 <- FeatureScatter(Loco, feature1 = ""nCount_RNA"", feature2 = ""nFeature_RNA"")"
+"0","plot1 + plot2"

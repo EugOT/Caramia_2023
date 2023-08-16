@@ -1,0 +1,6 @@
+"0","heatmapneur <- DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()"
+"2","Warning: The following features were omitted as they were not found in the scale.data slot for the integrated assay: Gm26917"
+"0","cowplot::save_plot(filename = 'Heatmap_markers_neurons.pdf',"
+"0","                   plot = heatmapneur,"
+"0","                   base_height = 10,"
+"0","                   base_asp = 1.6)"

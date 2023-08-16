@@ -1,0 +1,28 @@
+"0","lc.anchors <- FindIntegrationAnchors(object.list = lc.list, anchor.features = features, normalization.method = ""SCT"")"
+"2","Finding all pairwise anchors
+"
+"1",""
+"1"," "
+"1"," |                                                  |"
+"1"," "
+"1","0 % ~calculating  "
+"2","Running CCA
+"
+"2","Merging objects
+"
+"2","Finding neighborhoods
+"
+"2","Finding anchors
+"
+"2","	Found 895 anchors
+"
+"2","Filtering anchors
+"
+"2","Warning: Number of anchor cells is less than k.filter. Retaining all anchors."
+"1",""
+"1"," "
+"1"," |++++++++++++++++++++++++++++++++++++++++++++++++++|"
+"1"," "
+"1","100% elapsed=06s  "
+"1","
+"

@@ -1,0 +1,191 @@
+
+```{r packages}
+library(Seurat)
+library(SeuratDisk)
+library(patchwork)
+library(magrittr)
+library(dplyr)
+```
+
+```{r}
+lc1 <- LoadH5Seurat("data/Locus_Coruleus1.h5Seurat") 
+lc2 <- LoadH5Seurat("data/Locus_Coruleus.h5Seurat")
+```
+
+```{r}
+lc1$id <- "lc1"
+lc2$id <- "lc2"
+lc.list <- list(lc1, lc2)
+```
+
+```{r}
+features <- SelectIntegrationFeatures(object.list = lc.list, nfeatures = 10000)
+lc.list <- PrepSCTIntegration(object.list = lc.list, anchor.features = features)
+```
+
+```{r}
+lc.anchors <- FindIntegrationAnchors(object.list = lc.list, anchor.features = features, normalization.method = "SCT")
+```
+
+```{r}
+lc.combined <- IntegrateData(anchorset = lc.anchors, normalization.method = "SCT")
+```
+
+```{r}
+# original unmodified data still resides in the 'RNA' assay
+DefaultAssay(lc.combined) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+lc.combined <- RunPCA(lc.combined, npcs = 30, verbose = FALSE)
+lc.combined <- RunUMAP(lc.combined, reduction = "pca", dims = 1:30)
+lc.combined <- FindNeighbors(lc.combined, reduction = "pca", dims = 1:30)
+lc.combined <- FindClusters(lc.combined,  resolution = 4)
+```
+```{r}
+# Visualization
+p1 <- DimPlot(lc.combined, reduction = "umap", group.by = "id", )
+p2 <- DimPlot(lc.combined, reduction = "umap", label = TRUE, repel = TRUE)
+p1 + p2
+```
+```{r}
+table(lc.combined$id)
+```
+
+
+```{r}
+DimPlot(lc.combined, reduction = "umap", split.by = "id")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2"), order = T, , max.cutoff = "q80")
+```
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1"), order = T, max.cutoff = "q80")
+```
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "RNA"
+FeaturePlot(lc.combined, features = c("Slc17a6", "Slc17a7", "Gad2", "Gad1", "Npy", "Galr1", "Scrt2"), order = T, max.cutoff = "q80")
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combined) <- "SCT"
+FeaturePlot(lc.combined, slot = "scale.data", features = c("Hcrtr1", "Sstr2", "Calcr", "Galr1", "Scrt2"), order = T)
+```
+
+
+```{r markers-of-necells-conserved-across-ds, fig.width=8, fig.height=20}
+lc.combined1 <- PrepSCTFindMarkers(lc.combined)
+nephr.markers.std <- FindAllMarkers(lc.combined1, assay = "SCT", verbose = FALSE)
+nephr.markers.ROC <- FindAllMarkers(lc.combined1, assay = "SCT", test.use = "roc", verbose = FALSE)
+nephr.markers <- FindConservedMarkers(lc.combined1, assay = "SCT", 
+                                      ident.1 = "1", grouping.var = "id",
+                                      verbose = FALSE)
+head(nephr.markers, 10)
+
+
+plots <- VlnPlot(lc.combined1, features = rownames(nephr.markers)[1:10], split.by = "id",
+                 group.by = "seurat_clusters", pt.size = 0, combine = FALSE)
+wrap_plots(plots = plots, ncol = 1)
+
+FeaturePlot(lc.combined1, 
+            features = rownames(nephr.markers)[1:10],
+            split.by = "id", max.cutoff = 3,
+            order = FALSE, # here it's more convincing 
+            cols = c("#C0C9D1", "#801C29"))
+```
+```{r}
+nephr.markers.std %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+```
+
+```{r}
+nephr.markers.ROC %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = power) -> top10
+DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+```
+
+```{r}
+DefaultAssay(lc.combined) <- "integrated"
+lc.combinedTH <- subset(lc.combined, idents = 1)
+lc.combinedTH <- FindNeighbors(lc.combinedTH, reduction = "pca", dims = 1:30, n.trees = 200, annoy.metric = "cosine", verbose = FALSE) %>%
+  FindClusters(resolution = 1, algorithm = 1, verbose = FALSE) %>%
+  RunUMAP( dims = 1:30, verbose = FALSE) 
+DimHeatmap(lc.combinedTH, dims = 1:20, cells = 500, balanced = TRUE)
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), order = T)
+```
+```{r}
+DimPlot(lc.combinedTH, reduction = "umap")
+```
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTH) <- "SCT"
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1"), order = T, , max.cutoff = "q80")
+```
+
+```{r}
+DefaultAssay(lc.combined) <- "RNA"
+lc.combinedTHa <- subset(lc.combined, idents = 1)
+lc.combinedTHa <- DietSeurat(lc.combinedTHa, assays = "RNA")
+```
+
+```{r}
+lc.combinedTHa <- SCTransform(lc.combinedTHa, return.only.var.genes = FALSE, verbose = FALSE) %>%
+    RunPCA(verbose = FALSE) %>%
+    RunUMAP(dims = 1:20, verbose = FALSE) %>%
+    FindNeighbors(dims = 1:30, verbose = FALSE) %>%
+    FindClusters(resolution = 1, algorithm = 1, verbose = FALSE)
+DimHeatmap(lc.combinedTHa, dims = 1:20, cells = 500, balanced = TRUE)
+```
+```{r Umap all clusters resolution 0.3}
+DimPlot(lc.combinedTHa, reduction = "umap", split.by = "id")
+```
+```{r}
+(DimPlot(lc.combinedTHa, reduction = "umap", group.by = "integrated_snn_res.4")) + (DimPlot(lc.combinedTHa, reduction = "umap"))
+```
+
+```{r}
+FeaturePlot(lc.combinedTHa, slot = "scale.data", features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1"), order = T)
+```
+
+```{r}
+Idents(lc.combinedTHa) <- "integrated_snn_res.4"
+markersTHvsTH <- FindAllMarkers(lc.combinedTHa)
+markersTHvsTH %>%
+    group_by(cluster) %>%
+    slice_max(n = 30, order_by = avg_log2FC)
+```
+```{r}
+markersTHvsTH %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(lc.combinedTHa, features = top10$gene) + NoLegend()
+DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()
+```
+
+```{r}
+# For performing differential expression after integration, we switch back to the original
+# data
+DefaultAssay(lc.combinedTHa) <- "SCT"
+FeaturePlot(lc.combinedTHa, slot = "scale.data", features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2", "Calca", "Calcr", "Phox2a", "Phox2b", "Eya1", "Eya2", "Galr1"), order = T, , max.cutoff = "q80")
+```
+
+```{r}
+DefaultAssay(lc.combinedTH) <- "SCT"
+RunUMAP(lc.combinedTH, dims = 1:30, verbose = FALSE) 
+DimHeatmap(lc.combinedTH, dims = 1:20, cells = 500, balanced = TRUE)
+FeaturePlot(lc.combinedTH, slot = "scale.data", features = c("Phox2a", "Phox2b", "Eya1", "Eya2"), order = T)
+```

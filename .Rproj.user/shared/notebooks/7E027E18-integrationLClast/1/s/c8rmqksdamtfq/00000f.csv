@@ -1,0 +1,5 @@
+"0","nephr.markers.ROC %>%"
+"0","    group_by(cluster) %>%"
+"0","    top_n(n = 10, wt = power) -> top10"
+"0","DoHeatmap(lc.combined1, features = top10$gene) + NoLegend()"
+"2","Warning: The following features were omitted as they were not found in the scale.data slot for the integrated assay: Auts2"

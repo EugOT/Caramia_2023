@@ -1,0 +1,18 @@
+"0","Idents(lc.combinedTHa) <- ""integrated_snn_res.4"""
+"0","markersTHvsTH <- FindAllMarkers(lc.combinedTHa)"
+"2","Calculating cluster 1
+"
+"2","Warning: No DE genes identified"
+"2","Warning: The following tests were not performed: "
+"2","Warning: When testing 1 versus all:
+	Cell group 2 is empty - no cells with identity class "
+"0","markersTHvsTH %>%"
+"0","    group_by(cluster) %>%"
+"0","    slice_max(n = 30, order_by = avg_log2FC)"
+"1","[1m[33mError[39m in `group_by()`:[22m
+[38;5;254m[33m![38;5;254m Must group by variables found in `.data`.
+[31m✖[38;5;254m Column `cluster` is not found.[39m
+Backtrace:
+[90m 1. [39mmarkersTHvsTH %>% group_by(cluster) %>% ...
+[90m 4. [39m[1m[94mdplyr:::group_by.data.frame([39m[22m., cluster[1m[94m)[39m[22m
+"

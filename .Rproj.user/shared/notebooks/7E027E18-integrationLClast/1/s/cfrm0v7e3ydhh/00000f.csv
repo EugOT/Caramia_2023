@@ -1,0 +1,4 @@
+"0","# For performing differential expression after integration, we switch back to the original"
+"0","# data"
+"0","DefaultAssay(lc.combinedTH) <- ""SCT"""
+"0","FeaturePlot(lc.combinedTH, slot = ""scale.data"", features = c(""Gal"", ""Grp"", ""Sst"", ""Slc17a6"", ""Pdyn"", ""Cartpt"", ""Bdnf"", ""Th"", ""Slc18a2"", ""Dbh"", ""Scgn"", ""Slc6a2"", ""Calca"", ""Calcr"", ""Phox2a"", ""Phox2b"", ""Eya1"", ""Eya2"", ""Galr1"", ""Hcrtr1""), order = T, pt.size = 2, max.cutoff = ""q80"")"

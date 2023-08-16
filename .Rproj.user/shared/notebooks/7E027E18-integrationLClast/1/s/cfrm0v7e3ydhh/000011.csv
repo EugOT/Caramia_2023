@@ -1,0 +1,5 @@
+"0","GenesLCNE <- FeaturePlot(lc.combinedTH, slot = ""scale.data"", features = c(""Gal"", ""Grp"", ""Sst"", ""Slc17a6"", ""Pdyn"", ""Cartpt"", ""Bdnf"", ""Th"", ""Slc18a2"", ""Dbh"", ""Gad1"", ""Slc6a2"", ""Calca"", ""Calcr"", ""Phox2a"", ""Phox2b"", ""Eya1"", ""Eya2"", ""Galr1"", ""Hcrtr1""), order = T, pt.size = 2, max.cutoff = ""q80"")"
+"0","cowplot::save_plot(filename = 'FeaturePlot_genesLCNEsct.pdf',"
+"0","                   plot = GenesLCNE,"
+"0","                   base_height = 10,"
+"0","                   base_asp = 1.4)"

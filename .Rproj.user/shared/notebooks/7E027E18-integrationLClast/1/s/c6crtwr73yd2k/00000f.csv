@@ -1,0 +1,5 @@
+"0","# For performing differential expression after integration, we switch back to the original"
+"0","# data"
+"0","DefaultAssay(lc.combined) <- ""RNA"""
+"0","FeaturePlot(lc.combined, features = c(""Gal"", ""Calca"", ""Hcrt"", ""Cck"", ""Crh"", ""Ghrhr"", ""Kiss1"", ""Pomc"", ""Pmch"", ""Npy"", ""Nts"", ""Penk"", ""Pdyn"", ""Pnoc"", ""Oxt"", ""Sst"", ""Grp"", ""Cartpt"", ""Tac1"",""Tac2"", ""Tac3"", ""Trh"", ""Vip"", ""Avp"", ""Rln1"", ""Qrfp"", ""Npvf"", ""Adcyap1"", ""Bdnf"", ""Nms"", ""Nmb"", ""Nmu"", ""Ucn""), order = T, pt.size = 2, ncol = 6, max.cutoff = ""q80"")"
+"2","Warning: The following requested variables were not found (10 out of 11 shown): Hcrt, Ghrhr, Kiss1, Pmch, Tac2, Tac3, Trh, Rln1, Npvf, Nms"

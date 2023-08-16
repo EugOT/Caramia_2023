@@ -1,0 +1,5 @@
+"0","FP_NT <- FeaturePlot(lc.combined, features = c(""Tubb3"", ""Slc6a2"", ""Slc18a2"", ""Snap25"", ""Dbh"", ""Slc32a1"", ""Stmn2"", ""Gad1"", ""Gad2"", ""Ndrg4"", ""Slc17a6"", ""Slc17a7""), order = T, pt.size = 1.5, raster = FALSE, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), ncol = 3, max.cutoff = ""q80"")"
+"0","cowplot::save_plot(filename = 'FeaturePlot_NT_neurons.pdf',"
+"0","                   plot = FP_NT,"
+"0","                   base_height = 7,"
+"0","                   base_asp = 1.2)"

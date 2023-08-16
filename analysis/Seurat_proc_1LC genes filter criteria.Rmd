@@ -1,0 +1,149 @@
+```{r Data loading QC Violin}
+rm(list = ls())
+library(Seurat)
+library(dplyr)
+library(patchwork)
+library(magrittr)
+# Load the 1LC dataset
+Loco.data <- Read10X(data.dir = "~/data/Locus_Coruleus1/count/")
+# Initialize the Seurat object with the raw (non-normalized data).
+Loco <- CreateSeuratObject(counts = Loco.data, project = "Locus_Coruleus", min.cells = 3, min.features = 200)
+# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
+Loco[["percent.mt"]] <- PercentageFeatureSet(Loco, pattern = "^mt-")
+# Visualize QC metrics as a violin plot
+VlnPlot(Loco, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+# FeatureScatter is typically used to visualize feature-feature relationships, but can be used
+# for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+
+```
+```{r QC2 scatter, fig.width=8, fig.asp=0.618}
+plot1 <- FeatureScatter(Loco, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(Loco, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+```
+```{r SCTransform pipeline, fig.asp=0.618, fig.width=12}
+Loco <- subset(Loco, subset = nFeature_RNA > 500 & percent.mt < 10)
+# normalize and run dimensionality reduction on control dataset
+Loco <- SCTransform(Loco, return.only.var.genes = FALSE, verbose = FALSE, variable.features.n = 10000) %>%
+    RunPCA(npcs = 100, verbose = FALSE) %>%
+    RunUMAP(dims = 1:20, verbose = FALSE) %>%
+    FindNeighbors(reduction = "pca", dims = 1:100, n.trees = 200, annoy.metric = "cosine", verbose = FALSE) %>%
+    FindClusters(resolution = 5, algorithm = 1, verbose = FALSE)
+DimHeatmap(Loco, dims = 1:20, balanced = TRUE)
+```
+```{r elbow PCA}
+ElbowPlot(Loco, ndims = 30)
+```
+```{r UMAP all clusters resolution 5}
+DimPlot(Loco, reduction = "umap", label = TRUE)
+```
+0 and 11 - oligos
+1 - curious neurons Vglut1
+2 - glia
+3, 4, 6, 7, 8, 9, 10, 15, 16, 17 - neuronal cloud
+5 - non neuronal
+12 - Piezo neurons
+13 - glia
+14 - strange neurons
+
+```{r}
+Loco
+```
+```{r}
+table(Loco$seurat_clusters)
+```
+
+
+
+```{r neuronal genes, fig.asp=0.618, fig.width=20}
+FeaturePlot(Loco, features = c("Slc17a7", "Dbh", "Gad2", "Gad1", "Sst", "Slc17a6", "Stmn2", "Syt1", "Snap25", "Tubb3"), order = T)
+```
+```{r neuronal genes, fig.asp=0.618, fig.width=20}
+FeaturePlot(Loco, features = c("Slc18a2", "Dbh"), order = T)
+```
+
+```{r Markersfindallraw and save}
+Loco.markers <-
+  FindAllMarkers(Loco, only.pos = TRUE, test.use = "roc")
+Loco.markers %>%
+  group_by(cluster) %>%
+  slice_max(n = 10, order_by = avg_log2FC)
+readr::write_csv(Loco.markers,
+                 file = paste0("./data/",
+                               Project(object = Loco),
+                               "1_raw-markers.csv"))
+```
+```{r}
+Loco.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(Loco, features = top10$gene) + NoLegend()
+```
+
+```{r neuronal subset}
+Locon <- subset(Loco, idents = c(0,2,3,6,8,9,10,11,13,14,16,17,18,19,20))
+    RunPCA(Locon, npcs = 30, verbose = FALSE) %>%
+    RunUMAP(dims = 1:30, verbose = FALSE) %>%
+    FindNeighbors(reduction = "pca", dims = 1:30, n.trees = 200, annoy.metric = "cosine", verbose = FALSE) %>%
+    FindClusters(resolution = 1, algorithm = 1, verbose = FALSE)
+DimHeatmap(Locon, dims = 1:20, balanced = TRUE)
+```
+
+```{r UMAP neurons}
+DimPlot(Locon, reduction = "umap", label = TRUE)
+```
+```{r TSNE neurons}
+Locon <- RunTSNE(Locon, dims = 1:30, verbose = FALSE)
+DimPlot(Locon, reduction = "tsne", label = TRUE)
+```
+```{r markers neuons, fig.asp=0.618, fig.width=20}
+FeaturePlot(Locon, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2"), reduction = "tsne", order = T)
+```
+```{r}
+Loco.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(Locon, features = top10$gene) + NoLegend()
+```
+```{r}
+Locon4 <- FindNeighbors(Locon, reduction = "pca", dims = 1:30, n.trees = 200, annoy.metric = "cosine", verbose = FALSE) %>%
+    FindClusters(resolution = 3, algorithm = 1, verbose = FALSE) %>%
+    RunUMAP( dims = 1:30, verbose = FALSE)
+DimHeatmap(Locon4, dims = 1:20, cells = 500, balanced = TRUE)
+DimPlot(Locon4, reduction = "umap",label = T)
+```
+```{r}
+FeaturePlot(Locon4, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Calca"), order = T)
+```
+```{r TSNE neurons}
+Locon5 <- RunTSNE(Locon4, dims = 1:30, verbose = FALSE)
+DimPlot(Locon5, reduction = "tsne", label = TRUE)
+```
+```{r}
+FeaturePlot(Locon5, features = c("Gal", "Grp", "Sst", "Slc17a6", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Calca"),  reduction = "tsne", order = T)
+```
+```{r Markers}
+Locon4.markers <- FindAllMarkers(Locon4, only.pos = TRUE, test.use = "MAST", min.pct = 0.1, logfc.threshold = 0.25)
+Locon4.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 10, order_by = avg_log2FC)
+```
+```{r}
+Locon4.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(Locon4, features = top10$gene) + NoLegend()
+```
+
+```{r save neurons}
+SeuratDisk::SaveH5Seurat(Locon4, 
+                         filename = paste0("./data/",
+                                           Project(object = Locon), 
+                                           "1.h5Seurat"), 
+                         overwrite = TRUE)
+```
+
+```{r markers neuons, fig.asp=0.618, fig.width=20}
+FeaturePlot(Locon4, features = c("Galr1", "Npy", "Pdyn", "Cartpt", "Bdnf", "Th", "Slc18a2", "Dbh", "Gad1", "Slc6a2"), reduction = "tsne", order = T)
+```
+

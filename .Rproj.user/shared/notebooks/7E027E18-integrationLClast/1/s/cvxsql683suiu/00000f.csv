@@ -1,0 +1,2 @@
+"0","DefaultAssay(lc.combined) <- ""RNA"""
+"0","FeaturePlot(lc.combined, features = c(""Xist"", ""Tsix"", ""Eif2s3y"", ""Ddx3y"", ""Uty"", ""Kdm5d""), order = T, pt.size = 2, max.cutoff = ""q75"")"

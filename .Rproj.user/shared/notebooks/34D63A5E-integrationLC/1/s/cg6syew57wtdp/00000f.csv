@@ -1,0 +1,3 @@
+"0","DefaultAssay(lc.combined) <- ""RNA"""
+"0","lc.combinedTHa <- subset(lc.combined, idents = 1)"
+"0","lc.combinedTHa <- DietSeurat(lc.combinedTHa, assays = ""RNA"")"

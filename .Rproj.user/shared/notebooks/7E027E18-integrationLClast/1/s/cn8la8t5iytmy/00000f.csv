@@ -1,0 +1,4 @@
+"0","# For performing differential expression after integration, we switch back to the original"
+"0","# data"
+"0","DefaultAssay(lc.combined) <- ""RNA"""
+"0","FeaturePlot(lc.combined, features = c(""Th"", ""Dbh"", ""Gal"", ""Grp"", ""Pdyn"", ""Cartpt"", ""Bdnf"", ""Npy"", ""Cck"", ""Sst"", ""Crh"", ""Vip""), order = T, cols = c(rgb(0.9, 0.9, 0.9, alpha = 0.5), rgb(0, 0, 1, alpha = 0.7)), pt.size = 1.5, max.cutoff = ""q75"")"

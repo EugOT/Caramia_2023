@@ -1,0 +1,29 @@
+"0","rm(list = ls())"
+"0","library(Seurat)"
+"2","Attaching SeuratObject
+"
+"0","library(dplyr)"
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(patchwork)"
+"0","library(magrittr)"
+"0","# Load the LC dataset"
+"0","Loco.data <- Read10X(data.dir = ""~/data/Locus_Coruleus2/count/"")"
+"0","# Initialize the Seurat object with the raw (non-normalized data)."
+"0","Loco <- CreateSeuratObject(counts = Loco.data, project = ""Locus_Coruleus"", min.cells = 3, min.features = 200)"
+"0","# The [[ operator can add columns to object metadata. This is a great place to stash QC stats"
+"0","Loco[[""percent.mt""]] <- PercentageFeatureSet(Loco, pattern = ""^mt-"")"
+"0","# Visualize QC metrics as a violin plot"
+"0","VlnPlot(Loco, features = c(""nFeature_RNA"", ""nCount_RNA"", ""percent.mt""), ncol = 3)"

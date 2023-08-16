@@ -1,0 +1,26 @@
+{
+    "id": "18504DC9",
+    "path": "~/src/clones/Locus_Coruleus/analysis/integrationLC.Rmd",
+    "project_path": "analysis/integrationLC.Rmd",
+    "type": "r_markdown",
+    "hash": "2492300435",
+    "contents": "",
+    "dirty": false,
+    "created": 1681401863830.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "187,30",
+        "scrollLine": "177"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1681403972,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1681404473543,
+    "read_only": false,
+    "read_only_alternatives": []
+}

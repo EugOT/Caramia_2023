@@ -1,0 +1,6 @@
+"0",""
+"0","FeaturePlot(lc.combined1, "
+"0","            features = rownames(nephr.markers)[1:10],"
+"0","            split.by = ""id"", max.cutoff = 3,"
+"0","            order = FALSE, # here it's more convincing "
+"0","            cols = c(""#C0C9D1"", ""#801C29""))"

@@ -1,0 +1,5 @@
+"0","MarkersNPR <- FeaturePlot(lc.combined, features = c(""Hcrtr1"", ""Sstr2"", ""Calcr"", ""Galr1""), order = T,pt.size = 2, max.cutoff = ""q80"")"
+"0","cowplot::save_plot(filename = 'FeaturePlot_MarkersNPR.pdf',"
+"0","                   plot = MarkersNPR,"
+"0","                   base_height = 7,"
+"0","                   base_asp = 1.2)"

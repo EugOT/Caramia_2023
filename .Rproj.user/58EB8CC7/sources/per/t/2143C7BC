@@ -1,0 +1,27 @@
+{
+    "id": "2143C7BC",
+    "path": "~/src/clones/Locus_Coruleus/analysis/Seurat_proc_LC var_genes filter criteria.Rmd",
+    "project_path": "analysis/Seurat_proc_LC var_genes filter criteria.Rmd",
+    "type": "r_markdown",
+    "hash": "4054366524",
+    "contents": "",
+    "dirty": false,
+    "created": 1681402953715.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "chunk_output_type": "inline",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "80,0",
+        "scrollLine": "77"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1681403890,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1681403890872,
+    "read_only": false,
+    "read_only_alternatives": []
+}
